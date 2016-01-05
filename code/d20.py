@@ -67,6 +67,21 @@ def get_number_of_gifts(house_no, number_gifts_per_elf, factor_calculating_func)
     return sum(factor_calculating_func(house_no)) * number_gifts_per_elf
 
 def generate_local_minima_primary_numbers_list(size):
+    '''
+    Generates the local minima which guarantees that number_gifts/house_number is the highest
+    for the number of primary factors equal to `size`. In other words, no number lower than the generated value
+    can have produce number of gifts.
+    Background:
+    Lowest number that generates the highest number of gifts, the pattern of sorted primary factors is following:
+    [2,3]
+    [2,2,3]
+    [2,2,3,5]
+    [2,2,2,3,5,7]
+    [2,2,2,2,3,5,7]
+    [2,2,2,2,3,5,7,11]
+    :param size:
+    :return:
+    '''
     factors = []
     primary_nums = get_first_prime_nums(size)[1:]
     primary_nums.reverse()
@@ -81,6 +96,13 @@ def generate_local_minima_primary_numbers_list(size):
 
 
 def get_minimum_house_number_with_target_gifts(target, number_gifts_per_elf, factor_calculating_func):
+    '''
+    Main handler
+    :param target:
+    :param number_gifts_per_elf:
+    :param factor_calculating_func:
+    :return:
+    '''
     minima_list = None
     for i in range(2, int(numpy.log(target/10))):
         local_minima_list = generate_local_minima_primary_numbers_list(i)
@@ -94,9 +116,15 @@ def get_minimum_house_number_with_target_gifts(target, number_gifts_per_elf, fac
     i = minima
 
     while True:
+        # Optimization: a number can only be considered if none of it's prime factors exceed the highest prime number of
+        # the local minima
+        if max(get_prime_factors(i)) > max(minima_list):
+            i = i + incr
+            continue
         if (get_number_of_gifts(i, number_gifts_per_elf, factor_calculating_func) > target):
             return i
-        i = i + incr
+        else:
+            i = i + incr
 
 # Part 1
 print(get_minimum_house_number_with_target_gifts(33100000, 10, get_all_factors))
