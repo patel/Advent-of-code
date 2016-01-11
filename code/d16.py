@@ -1,6 +1,6 @@
+import itertools
 import re
 from collections import defaultdict
-import itertools
 
 
 def parse_input_into_dict(input_str):
@@ -15,6 +15,21 @@ def find_index_with_matching_option(all_sues, MFCAM_op):
     available_options = map(lambda x: dict(x), itertools.combinations(MFCAM_op.iteritems(), 3))
     for index, attrs in all_sues.iteritems():
         if attrs in available_options:
+            return index
+
+
+def find_index_with_matching_option_range(all_sues, MFCAM_op, minimum, maximum):
+    for index, attrs in all_sues.iteritems():
+        not_found = True
+        for attr, value in attrs.iteritems():
+            if (attr in minimum and MFCAM_op[attr] > value) or \
+                (attr in maximum and MFCAM_op[attr] < value) or \
+                (attr not in minimum and attr not in maximum and MFCAM_op[attr] == value):
+                continue
+            else:
+                not_found = False
+                break
+        if not_found:
             return index
 
 
@@ -535,3 +550,6 @@ MFCAM_op = {
 
 # Part 1
 print find_index_with_matching_option(all_sues, MFCAM_op)
+
+# Part 2
+print find_index_with_matching_option_range(all_sues, MFCAM_op, ['pomeranians', 'goldfish'], ['cats', 'trees '])
