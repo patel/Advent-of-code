@@ -1,5 +1,5 @@
-import re
 import itertools
+import re
 from collections import defaultdict
 
 
@@ -10,22 +10,17 @@ def filter_key_from_ingredients(ingredients, key):
         del v[key]
 
 
-def generate_max_options(ingredients, max=100, filter_key='calories'):
+def generate_max_options(ingredients, max_val=100, filter_key='calories', filter_key_value=None, should_filter=False):
     filter_key_from_ingredients(ingredients, None)
-    max_amount = 0
-    max_sequence = []
-    all_options = generate_all_options(len(ingredients), max)
+    amount = 0
+    all_options = generate_all_options(len(ingredients), max_val)
     transformed = get_transformed_ingredients(ingredients)
-    print transformed
+    filter_index = transformed.keys().index(filter_key)
     for option in all_options:
-        x = map(lambda x: sum(map(lambda t: int(t[0])*int(t[1]), zip(x.values(), option))), transformed.values())
-        if x[2] == 500:
-            amount = reduce(lambda x, y: x*y if x>0 and y>0 else 0, map(lambda x: sum(map(lambda t: int(t[0])*int(t[1]), zip(x.values(), option))), transformed.values()))
-            if max_amount < amount:
-                max_amount = amount
-                max_sequence = option
-
-    return (max_amount, max_sequence)
+        comb = map(lambda x: sum(map(lambda t: int(t[0]) * int(t[1]), zip(x.values(), option))), transformed.values())
+        if should_filter and comb[filter_index] == filter_key_value or not should_filter:
+            amount = max(amount, reduce(lambda a, b: a * b if a > 0 and b > 0 else 0, comb) / comb[filter_index])
+    return amount
 
 
 def get_transformed_ingredients(ingredients):
@@ -39,7 +34,7 @@ def get_transformed_ingredients(ingredients):
 def generate_all_options(dimensions, limit):
     args = []
     for i in range(0, dimensions):
-        args.append(range(0, limit+1))
+        args.append(range(0, limit + 1))
     return filter(lambda x: sum(x) == limit, itertools.product(*args))
 
 
@@ -47,16 +42,15 @@ def read_ingredients(input_str):
     ingredients_lookup = {}
     for line in input_str.split('\n'):
         matches = re.match(r'([a-zA-Z]*): (.*)', line)
-        ingredients_lookup[matches.group(1)] = {v[0]: int(v[1]) for v in map(lambda a: a.split(' '), matches.group(2).split(', '))}
+        ingredients_lookup[matches.group(1)] = {v[0]: int(v[1]) for v in
+                                                map(lambda a: a.split(' '), matches.group(2).split(', '))}
     return ingredients_lookup
 
 
-
-print generate_max_options(read_ingredients('''Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8
-Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3'''))
-
-
-print generate_max_options(read_ingredients('''Sprinkles: capacity 2, durability 0, flavor -2, texture 0, calories 3
+input_str = '''Sprinkles: capacity 2, durability 0, flavor -2, texture 0, calories 3
 Butterscotch: capacity 0, durability 5, flavor -3, texture 0, calories 3
 Chocolate: capacity 0, durability 0, flavor 5, texture -1, calories 8
-Candy: capacity 0, durability -1, flavor 0, texture 5, calories 8'''))
+Candy: capacity 0, durability -1, flavor 0, texture 5, calories 8'''
+
+print generate_max_options(read_ingredients(input_str), 100, 'calories')
+print generate_max_options(read_ingredients(input_str), 100, 'calories', 500, True)
