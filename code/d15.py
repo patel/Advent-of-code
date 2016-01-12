@@ -11,17 +11,19 @@ def filter_key_from_ingredients(ingredients, key):
 
 
 def generate_max_options(ingredients, max=100, filter_key='calories'):
-    filter_key_from_ingredients(ingredients, filter_key)
+    filter_key_from_ingredients(ingredients, None)
     max_amount = 0
     max_sequence = []
     all_options = generate_all_options(len(ingredients), max)
     transformed = get_transformed_ingredients(ingredients)
-
+    print transformed
     for option in all_options:
-        amount = reduce(lambda x, y: x*y if x>0 and y>0 else 0, map(lambda x: sum(map(lambda t: int(t[0])*int(t[1]), zip(x.values(), option))), transformed.values()))
-        if max_amount < amount:
-            max_amount = amount
-            max_sequence = option
+        x = map(lambda x: sum(map(lambda t: int(t[0])*int(t[1]), zip(x.values(), option))), transformed.values())
+        if x[2] == 500:
+            amount = reduce(lambda x, y: x*y if x>0 and y>0 else 0, map(lambda x: sum(map(lambda t: int(t[0])*int(t[1]), zip(x.values(), option))), transformed.values()))
+            if max_amount < amount:
+                max_amount = amount
+                max_sequence = option
 
     return (max_amount, max_sequence)
 
