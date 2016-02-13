@@ -1,9 +1,6 @@
-def execute_program(program_lines):
+def execute_program(program_lines, initial_values):
     i = 0
-    registers = {
-        'a': 0,
-        'b': 0
-    }
+    registers = initial_values
     while (i < len(program_lines)):
         program_line = program_lines[i]
         offset = 1
@@ -24,7 +21,7 @@ def execute_program(program_lines):
 
     return registers['b']
 
-print execute_program([
+instructions = [
 'jio a, +19',
 'inc a',
 'tpl a',
@@ -73,8 +70,7 @@ print execute_program([
 'inc a',
 'jmp +2',
 'hlf a',
-'jmp -7'])
+'jmp -7']
 
-""" Output
-184
-"""
+print execute_program(instructions, {'a': 0 , 'b': 0})
+print execute_program(instructions, {'a': 1 , 'b': 0})
