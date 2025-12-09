@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-// Using int64 for area to prevent potential overflow,
-// though coordinates fit in standard int on 64-bit systems.
 type Point struct {
 	X, Y int
 }
